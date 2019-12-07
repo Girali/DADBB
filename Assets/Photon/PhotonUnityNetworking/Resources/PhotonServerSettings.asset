@@ -31,5 +31,7 @@ MonoBehaviour:
   RpcList:
   - ClickRpc
   - DestroyRpc
+  - RPC_StartGame
+  - RPC_setLife
   DisableAutoOpenWizard: 1
   ShowSettings: 0

@@ -11,9 +11,11 @@ public class PlayerController : MonoBehaviour
     float currentLookSensitivity = 2f;
     float currentCameraRotationX = 0f;
     float cameraRotationLimit = 85f;
+    int life = 80;
 
     PhotonView pv;
     Rigidbody rb;
+    PlayerView playerView;
     [SerializeField]
     Transform view = null;
 
@@ -49,31 +51,66 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    void Death()
+    {
+        PhotonNetwork.RemoveRPCs(pv);
+        PhotonNetwork.Destroy(pv);
+    }
+
+    public void AddLife(int i)
+    {
+        life += i;
+
+        if (life < 0)
+            life = 0;
+
+
+        if (life > 80)
+            life = 80;
+
+        playerView.UpdateLife(life);
+
+        pv.RPC("RPC_setLife", RpcTarget.Others, life);
+
+        if (life == 0)
+            Death();
+    }
+
+    [PunRPC]
+    public void RPC_setLife(int life)
+    {
+        playerView.UpdateLife(life);
+        this.life = life;
+    }
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
         pv = GetComponent<PhotonView>();
+        playerView = GetComponent<PlayerView>();
+
+        if (!pv.Owner.IsMasterClient)
+        {
+            for (int i = 0; i < view.childCount; i++)
+            {
+                if (view.GetChild(i).GetComponent<Camera>())
+                    view.GetChild(i).GetComponent<Camera>().clearFlags = CameraClearFlags.Skybox;
+            }
+        }
+        else
+        {
+            Destroy(GetComponent<MeshRenderer>());
+            Destroy(GetComponent<MeshFilter>());
+            gameObject.layer = 8;
+            transform.localScale = new Vector3(50, 50, 50);
+            speed = 25f;
+        }
 
         if (pv.IsMine)
         { 
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
             gameObject.tag = "LocalPlayer";
-
-            if (!PhotonNetwork.IsMasterClient)
-            {
-                for (int i = 0; i < view.childCount; i++)
-                {
-                    view.GetChild(i).GetComponent<Camera>().clearFlags = CameraClearFlags.Skybox;
-                }
-            }
-            else
-            {
-                Destroy(GetComponent<MeshRenderer>());
-                Destroy(GetComponent<MeshFilter>());
-                transform.localScale = new Vector3(1, 50, 1);
-                speed = 25f;
-            }
         }
         else
         {
@@ -85,6 +122,11 @@ public class PlayerController : MonoBehaviour
     {
         if (pv.IsMine)
         {
+            if (Input.GetKeyDown(KeyCode.O))
+                AddLife(10);
+
+            if (Input.GetKeyDown(KeyCode.P))
+                AddLife(-10);
 
             CameraMouvement(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
         }
