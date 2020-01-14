@@ -31,7 +31,8 @@ public class EnemyController : MonoBehaviour
 
     private void Update()
     {
-
+        if (pv.Owner.IsMasterClient)
+        {
             GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
 
             float minDistance = float.MaxValue;
@@ -48,12 +49,12 @@ public class EnemyController : MonoBehaviour
 
             navMeshAgent.SetDestination(closestPlayer.transform.position);
 
-        if(!isAttacking)
-            if (Vector3.Distance(closestPlayer.transform.position, transform.position) < 1.5f)
-            {
-                StartCoroutine(Attack(closestPlayer));
-            }
-        
+            if (!isAttacking)
+                if (Vector3.Distance(closestPlayer.transform.position, transform.position) < 1.5f)
+                {
+                    StartCoroutine(Attack(closestPlayer));
+                }
+        }
     }
 
     IEnumerator Attack(GameObject other)
