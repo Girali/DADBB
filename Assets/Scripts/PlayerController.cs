@@ -101,6 +101,8 @@ public class PlayerController : MonoBehaviour
         {
             Destroy(GetComponent<MeshRenderer>());
             Destroy(GetComponent<MeshFilter>());
+            GetComponent<Rigidbody>().useGravity = false;
+            GetComponent<CapsuleCollider>().enabled = false;
             gameObject.layer = 8;
             transform.localScale = new Vector3(50, 50, 50);
             speed = 25f;
