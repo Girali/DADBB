@@ -398,6 +398,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a8fb5abfb62012d45a52f46fb3379a91, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  offline: 0
   view: {fileID: 1779508848}
 --- !u!114 &-6339896360219432905
 MonoBehaviour:
@@ -415,6 +416,7 @@ MonoBehaviour:
   metaLife: {fileID: 8693053730746331897}
   diagLife: {fileID: 8125508783740761582}
   meshRenderer: {fileID: 41718795799754351}
+  offline: 0
 --- !u!114 &4513016547991970668
 MonoBehaviour:
   m_ObjectHideFlags: 0

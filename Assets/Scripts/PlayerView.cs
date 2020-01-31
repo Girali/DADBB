@@ -10,20 +10,28 @@ public class PlayerView : MonoBehaviour
     public Text metaLife;
     public Text diagLife;
     public MeshRenderer meshRenderer;
+    public bool offline = false;
     PhotonView pv;
 
     private void Awake()
     {
         pv = GetComponent<PhotonView>();
-        if (pv.IsMine)
+        if(offline)
         {
             Destroy(diagLife.transform.parent.gameObject);
         }
-
-        if (pv.Owner.IsMasterClient)
+        else
         {
-            Destroy(diagLife.transform.parent.gameObject);
-            Destroy(metaLife.transform.parent.gameObject);
+            if (pv.IsMine)
+            {
+                Destroy(diagLife.transform.parent.gameObject);
+            }
+
+            if (pv.Owner.IsMasterClient)
+            {
+                Destroy(diagLife.transform.parent.gameObject);
+                Destroy(metaLife.transform.parent.gameObject);
+            }
         }
     }
 

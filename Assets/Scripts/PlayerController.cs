@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour
     float currentCameraRotationX = 0f;
     float cameraRotationLimit = 85f;
     int life = 80;
+    public bool offline = false;
 
     PhotonView pv;
     Rigidbody rb;
@@ -89,8 +90,11 @@ public class PlayerController : MonoBehaviour
         pv = GetComponent<PhotonView>();
         playerView = GetComponent<PlayerView>();
 
-        if (!pv.Owner.IsMasterClient)
+        if(offline)
         {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+            gameObject.tag = "LocalPlayer";
             for (int i = 0; i < view.childCount; i++)
             {
                 if (view.GetChild(i).GetComponent<Camera>())
@@ -99,30 +103,41 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            Destroy(GetComponent<MeshRenderer>());
-            Destroy(GetComponent<MeshFilter>());
-            GetComponent<Rigidbody>().useGravity = false;
-            GetComponent<CapsuleCollider>().enabled = false;
-            gameObject.layer = 8;
-            transform.localScale = new Vector3(50, 50, 50);
-            speed = 25f;
-        }
+            if (!pv.Owner.IsMasterClient)
+            {
+                for (int i = 0; i < view.childCount; i++)
+                {
+                    if (view.GetChild(i).GetComponent<Camera>())
+                        view.GetChild(i).GetComponent<Camera>().clearFlags = CameraClearFlags.Skybox;
+                }
+            }
+            else
+            {
+                Destroy(GetComponent<MeshRenderer>());
+                Destroy(GetComponent<MeshFilter>());
+                GetComponent<Rigidbody>().useGravity = false;
+                GetComponent<CapsuleCollider>().enabled = false;
+                gameObject.layer = 8;
+                transform.localScale = new Vector3(50, 50, 50);
+                speed = 25f;
+            }
 
-        if (pv.IsMine)
-        { 
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
-            gameObject.tag = "LocalPlayer";
-        }
-        else
-        {
-            Destroy(view.gameObject);
+            if (pv.IsMine)
+            { 
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+                gameObject.tag = "LocalPlayer";
+            }
+            else
+            {
+                Destroy(view.gameObject);
+            }
         }
     }
 
     private void Update()
     {
-        if (pv.IsMine)
+        if (pv.IsMine || offline)
         {
             if (Input.GetKeyDown(KeyCode.O))
                 AddLife(10);
@@ -136,9 +151,8 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (pv.IsMine)
+        if (pv.IsMine|| offline)
         {
-
             Mouvement(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
         }
     }
