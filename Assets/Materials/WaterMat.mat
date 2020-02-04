@@ -123,8 +123,8 @@ Material:
     - _WaterFalloff: -12.21
     - _WaterSmoothness: 0.3
     - _WaterSpecular: 0.3
-    - _WavesAmount: 9.99
-    - _WavesAmplitude: -0.13
+    - _WavesAmount: 30
+    - _WavesAmplitude: 0.05
     - _ZWrite: 1
     - __dirty: 0
     m_Colors:
