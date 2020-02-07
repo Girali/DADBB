@@ -124,7 +124,7 @@ Material:
     - _WaterSmoothness: 0.3
     - _WaterSpecular: -0.2
     - _WavesAmount: 10
-    - _WavesAmplitude: 0.2
+    - _WavesAmplitude: 0.25
     - _ZWrite: 1
     - __dirty: 0
     m_Colors:
