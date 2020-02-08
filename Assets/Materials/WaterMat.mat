@@ -120,9 +120,9 @@ Material:
     - _TessValue: 23
     - _UVSec: 0
     - _WaterDepth: 0.7
-    - _WaterFalloff: 0.05
+    - _WaterFalloff: 0.15
     - _WaterSmoothness: 0.18
-    - _WaterSpecular: 0
+    - _WaterSpecular: -0.02
     - _WavesAmount: 0.84
     - _WavesAmplitude: 0.05
     - _ZWrite: 1

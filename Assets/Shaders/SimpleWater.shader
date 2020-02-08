@@ -11,10 +11,10 @@ Shader "LowPoly/SimpleWater"
 		_WaterFalloff("Water Falloff", Float) = 0
 		_WaterSpecular("Water Specular", Float) = 0
 		_WaterSmoothness("Water Smoothness", Float) = 0
-		_Distortion("Distortion", Float) = 0.5
+		//_Distortion("Distortion", Float) = 0.5
 		_Foam("Foam", 2D) = "white" {}
 		_FoamDepth("Foam Depth", Float) = 0
-		_FoamFalloff("Foam Falloff", Float) = 0
+		//_FoamFalloff("Foam Falloff", Float) = 0
 		_FoamSpecular("Foam Specular", Float) = 0
 		_FoamSmoothness("Foam Smoothness", Float) = 0
 		_WavesAmplitude("WavesAmplitude", Float) = 0.1
