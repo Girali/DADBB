@@ -29,9 +29,9 @@ Shader "LowPoly/SimpleWater"
 		Cull Back
 		GrabPass{ } //utilise la texture derrière l'objet en seconde texture
 		CGPROGRAM
-		/*#include "UnityStandardUtils.cginc"
+		#include "UnityStandardUtils.cginc" //enable blendNormals
 		#include "UnityShaderVariables.cginc"
-		#include "UnityCG.cginc"*/
+		#include "UnityCG.cginc"
 		#pragma target 4.6
 		#pragma surface surf StandardSpecular keepalpha vertex:vertexDataFunc tessellate:tessFunction 
 		struct Input
@@ -67,46 +67,52 @@ Shader "LowPoly/SimpleWater"
 			return _TessValue;
 		}
 
-		void vertexDataFunc( inout appdata_full v )
+		void vertexDataFunc( inout appdata_full v ) //données vertex : pos, tan, norm, tex_coords, color
 		{
-			float3 ase_vertex3Pos = v.vertex.xyz;
-			float3 ase_vertexNormal = v.normal.xyz;
-			v.vertex.xyz += ( ( sin( ( ( _WavesAmount * ase_vertex3Pos.z ) + _Time.y ) ) * ase_vertexNormal ) * _WavesAmplitude );
+			float3 vertex3Pos = v.vertex.xyz;
+			float3 vertexNormal = v.normal.xyz;
+			v.vertex.xyz += ( ( sin( ( ( _WavesAmount * vertex3Pos.z ) + _Time.y ) ) * vertexNormal ) * _WavesAmplitude );
 		}
 
-		void surf( Input i , inout SurfaceOutputStandardSpecular o )
+		void surf( Input i , inout SurfaceOutputStandardSpecular o ) //i renvoie au struct: tex_coords et screenPos
 		{
 			float2 uv_WaterNormal = i.uv_texcoord * _WaterNormal_ST.xy + _WaterNormal_ST.zw;
-			float2 panner22 = ( uv_WaterNormal + 1.0 * _Time.y * float2( -0.03,0 ));
-			float2 panner19 = ( uv_WaterNormal + 1.0 * _Time.y * float2( 0.04,0.04 ));
-			float3 temp_output_24_0 = BlendNormals( UnpackScaleNormal( tex2D( _WaterNormal, panner22 ) ,_NormalScale ) , UnpackScaleNormal( tex2D( _WaterNormal, panner19 ) ,_NormalScale ) );
-			o.Normal = temp_output_24_0;
-			float4 ase_screenPos = float4( i.screenPos.xyz , i.screenPos.w + 0.00000000001 );
-			float eyeDepth1 = LinearEyeDepth(UNITY_SAMPLE_DEPTH(tex2Dproj(_CameraDepthTexture,UNITY_PROJ_COORD(ase_screenPos))));
-			float temp_output_89_0 = abs( ( eyeDepth1 - ase_screenPos.w ) );
-			float temp_output_94_0 = saturate( pow( ( temp_output_89_0 + _WaterDepth ) , _WaterFalloff ) );
-			float4 lerpResult13 = lerp( _DeepColor , _ShalowColor , temp_output_94_0);
-			float2 uv_Foam = i.uv_texcoord * _Foam_ST.xy + _Foam_ST.zw;
-			float2 panner116 = ( uv_Foam + 1.0 * _Time.y * float2( -0.01,0.01 ));
-			float temp_output_114_0 = ( saturate( pow( ( temp_output_89_0 + _FoamDepth ) , _FoamFalloff ) ) * tex2D( _Foam, panner116 ).r );
-			float4 lerpResult117 = lerp( lerpResult13 , float4(1,1,1,0) , temp_output_114_0);
-			float4 ase_screenPos164 = ase_screenPos;
+			float2 uv_WaterBase = ( uv_WaterNormal + 1.0 * _Time.y * float2( -0.03,0 )); //base normal map
+			float2 uv_WaterSec = ( uv_WaterNormal + 1.0 * _Time.y * float2( 0.04,0.04 )); //secondary normal map
+			float3 blendNormals = BlendNormals( UnpackScaleNormal( tex2D( _WaterNormal, uv_WaterBase) ,_NormalScale ) , UnpackScaleNormal( tex2D( _WaterNormal, uv_WaterSec) ,_NormalScale ) );
+			o.Normal = blendNormals;
+
+			float4 screenPos = i.screenPos.xyzw;
+			float eyeDepth = LinearEyeDepth(UNITY_SAMPLE_DEPTH(tex2Dproj(_CameraDepthTexture,UNITY_PROJ_COORD(screenPos))));
+			float depthTex = abs(( eyeDepth - screenPos.w )); //effet de profondeur de la texture en fonction de la pos
+			float depthWaterCoeff = saturate( pow((depthTex + _WaterDepth ) , _WaterFalloff ));
+			float4 texWaterColor = lerp( _DeepColor , _ShalowColor , depthWaterCoeff);
+			float2 uv_FoamNormal = i.uv_texcoord * _Foam_ST.xy + _Foam_ST.zw;
+			float2 uv_Foam = ( uv_FoamNormal + 1.0 * _Time.y * float2( -0.01,0.01 ));
+			float depthFoamCoeff = ( saturate( pow( (depthTex + _FoamDepth ) , _FoamFalloff ) ) * tex2D( _Foam, uv_Foam ).r );
+			float4 texFoamColor = lerp(texWaterColor, float4(1,1,1,0) , depthFoamCoeff);
+			float4 screen_Pos = screenPos;
+
 			#if UNITY_UV_STARTS_AT_TOP // true pour les directx platform, contre l'image flipping
 			float uv_norm = -1.0;
 			#else
 			float uv_norm = 1.0;
 			#endif
-			float halfPosW164 = ase_screenPos164.w * 0.5;
-			ase_screenPos164.y = ( ase_screenPos164.y - halfPosW164 ) * _ProjectionParams.x* uv_norm + halfPosW164;
-			ase_screenPos164.xyzw /= ase_screenPos164.w;
-			float4 screenColor65 = tex2D( _GrabTexture, ( float3( (ase_screenPos164).xy ,  0.0 ) + ( temp_output_24_0 * _Distortion ) ).xy );
-			float4 lerpResult93 = lerp( lerpResult117 , screenColor65 , temp_output_94_0);
-			o.Albedo = lerpResult93.rgb;
-			float lerpResult130 = lerp( _WaterSpecular , _FoamSpecular , temp_output_114_0);
-			float3 temp_cast_3 = (lerpResult130).xxx;
-			o.Specular = temp_cast_3;
-			float lerpResult133 = lerp( _WaterSmoothness , _FoamSmoothness , temp_output_114_0);
-			o.Smoothness = lerpResult133;
+
+			float halfScreen = screen_Pos.w * 0.5;
+			screen_Pos.y = (screen_Pos.y - halfScreen) * _ProjectionParams.x* uv_norm + halfScreen;
+			screen_Pos.xyzw /= screen_Pos.w;
+
+			float4 texEffect = tex2D( _GrabTexture, ( float3( (screen_Pos).xy ,  0.0 ) + (blendNormals * _Distortion ) ).xy );
+			float4 texAlbedo = lerp( texFoamColor , texEffect, depthWaterCoeff);
+			o.Albedo = texAlbedo.rgb;
+
+			float texSpecular = lerp( _WaterSpecular , _FoamSpecular , depthFoamCoeff);
+			float3 texSpecular_x = (texSpecular).xxx;
+			o.Specular = texSpecular_x;
+
+			float texSmoothness = lerp( _WaterSmoothness , _FoamSmoothness , depthFoamCoeff);
+			o.Smoothness = texSmoothness;
 			o.Alpha = 1;
 		}
 		ENDCG
