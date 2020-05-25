@@ -6,22 +6,13 @@ using UnityEngine;
 public class TowerStats : ScriptableObject
 {
     public string towerName;
-    public string description;
 
-    public Sprite artwork;
-
-    public int manaCost;
     public int attack;
     public int health;
-    public int attackSpeed;
+    public float attackSpeed;
+    public float rotationSpeed;
 
-    public int radiusProjectile;
-    public int radiusDamageProjectile;
+    public float bulletSpeed;
 
     public GameObject projectile;
-
-    public void Print()
-    {
-        Debug.Log(towerName + ": " + description + " ManaCost : " + manaCost);
-    }
 }

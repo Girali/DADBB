@@ -19,6 +19,7 @@ public class PlayerController : MonoBehaviour
     PlayerView playerView;
     [SerializeField]
     Transform view = null;
+    PlayerBuilderMotor playerBuilderMotor;
 
     void Mouvement(float x, float z)
     {
@@ -89,8 +90,9 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         pv = GetComponent<PhotonView>();
         playerView = GetComponent<PlayerView>();
+        playerBuilderMotor = GetComponent<PlayerBuilderMotor>();
 
-        if(offline)
+        if (offline)
         {
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
@@ -145,9 +147,43 @@ public class PlayerController : MonoBehaviour
                 RaycastHit hit;
                 if (Physics.Raycast(view.transform.position, view.transform.forward, out hit))
                 {
-                    Vector3Int v = new Vector3Int(Mathf.FloorToInt(hit.point.x), Mathf.FloorToInt(hit.point.y), Mathf.FloorToInt(hit.point.z));
-                    gizmoView.transform.position = v + new Vector3(0.5f,0, 0.5f);
+                    Vector3Int v = new Vector3Int(Mathf.FloorToInt(hit.point.x), 0, Mathf.FloorToInt(hit.point.z));
+                    if (hit.distance < 4f)
+                    {
+                        gizmoView.transform.position = v + new Vector3(0.5f, Mathf.FloorToInt(hit.point.y) + 0.25f, 0.5f);
+                        if(Physics.CheckBox(v + new Vector3(0.5f, Mathf.FloorToInt(hit.point.y) + 0.75f, 0.5f),new Vector3(0.5f,0.5f,0.5f)))
+                        {
+                            gizmoView.IsNotOk();
+                        }
+                        else
+                        {
+                            gizmoView.IsOk();
+                            if (Input.GetKeyDown(KeyCode.Alpha1))
+                                playerBuilderMotor.SpawnTowerAt(gizmoView.transform.position, 0);
+                            if (Input.GetKeyDown(KeyCode.Alpha2))
+                                playerBuilderMotor.SpawnTowerAt(gizmoView.transform.position, 1);
+                            if (Input.GetKeyDown(KeyCode.Alpha3))
+                                playerBuilderMotor.SpawnTowerAt(gizmoView.transform.position, 2);
+                            if (Input.GetKeyDown(KeyCode.Alpha4))
+                                playerBuilderMotor.SpawnTowerAt(gizmoView.transform.position, 3);
+                        }
+                    }
+                    else
+                    {
+                        gizmoView.transform.position = Vector3.zero;
+                    }
                 }
+            }
+            else
+            {
+                if (Input.GetKeyDown(KeyCode.Alpha1))
+                    Debug.Log("Use1");
+                if (Input.GetKeyDown(KeyCode.Alpha2))
+                    Debug.Log("Use2");
+                if (Input.GetKeyDown(KeyCode.Alpha3))
+                    Debug.Log("Use3");
+                if (Input.GetKeyDown(KeyCode.Alpha4))
+                    Debug.Log("Use4");
             }
 
             if (Input.GetKeyDown(KeyCode.O))

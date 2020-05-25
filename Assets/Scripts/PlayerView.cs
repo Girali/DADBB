@@ -6,8 +6,6 @@ using Photon.Pun;
 
 public class PlayerView : MonoBehaviour
 {
-    public Timer timer;
-    public Text metaLife;
     public Text diagLife;
     public MeshRenderer meshRenderer;
     public bool offline = false;
@@ -30,15 +28,13 @@ public class PlayerView : MonoBehaviour
             if (pv.Owner.IsMasterClient)
             {
                 Destroy(diagLife.transform.parent.gameObject);
-                Destroy(metaLife.transform.parent.gameObject);
             }
         }
     }
 
     public void UpdateLife(int life)
     {
-        if (metaLife)
-            metaLife.text = life.ToString();
+        GUI_Controller.Instance.life.text = life.ToString();
 
         if (diagLife)
             diagLife.text = life.ToString();
@@ -46,6 +42,6 @@ public class PlayerView : MonoBehaviour
 
     public void StartGame()
     {
-        timer.StartTimer();
+        GUI_Controller.Instance.timer.StartTimer();
     }
 }

@@ -1,32 +1,35 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using Photon.Pun;
 public class Projectile : MonoBehaviour
 {
-    public int speed;
+    public float speed;
     public int damage;
-    public int radiusDamage;
-    public int radius;
 
-    public void Init(int pSpeed, int pDamage, int pRadiusDamage, int pRadius)
+    public void Init(float pSpeed, int pDamage)
     {
         speed = pSpeed;
         damage = pDamage;
-        radiusDamage = pRadiusDamage;
-        radius = pRadius;
     }
 
     private void FixedUpdate()
     {
-        transform.position += transform.forward * Time.deltaTime * speed;
+        if (PhotonNetwork.IsMasterClient)
+        {
+            transform.position += transform.forward * Time.deltaTime * speed;
+        }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.tag == "Enemy")
+        if (PhotonNetwork.IsMasterClient)
         {
-            Explode();
+            if (other.tag == "Enemy")
+            {
+                other.GetComponent<EnemyController>().AddLife(-damage);
+                Explode();
+            }
         }
     }
 

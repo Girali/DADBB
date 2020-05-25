@@ -6,15 +6,14 @@ using Photon.Pun;
 
 public class EnemyController : MonoBehaviour
 {
+    public EnemyStats enemyStats;
     PhotonView pv;
     EnemyView enemyView;
     NavMeshAgent navMeshAgent;
     int currentLife;
-    int maxLife = 80;
-    float speed = 5f;
-    int dmg = 10;
-    float attackSpeed = 1f;
+    int maxLife;
     bool isAttacking = false;
+    GameObject currentTargetTower = null;
 
     private void Awake()
     {
@@ -23,52 +22,99 @@ public class EnemyController : MonoBehaviour
         navMeshAgent = GetComponent<NavMeshAgent>();
     }
 
-    public void Init(int i)
+    public void Start()
     {
-        currentLife = maxLife;
+        currentLife = enemyStats.health;
+        maxLife = currentLife;
         enemyView.Init(currentLife);
     }
 
     private void Update()
     {
-        if (pv.Owner.IsMasterClient)
+        if (PhotonNetwork.IsMasterClient)
         {
-            GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-
-            float minDistance = float.MaxValue;
-            GameObject closestPlayer = null;
-
-            foreach (GameObject p in players)
+            if (currentTargetTower == null)
             {
-                if (Vector3.Distance(p.transform.position, transform.position) < minDistance)
+                GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+                GameObject[] towers = GameObject.FindGameObjectsWithTag("Tower");
+
+                float minDistancePLayer = float.MaxValue;
+                GameObject closestPlayer = null;
+
+                float minDistanceTower = float.MaxValue;
+                GameObject closestTower = null;
+
+                foreach (GameObject p in players)
                 {
-                    closestPlayer = p;
-                    minDistance = Vector3.Distance(p.transform.position, transform.position);
+                    if (Vector3.Distance(p.transform.position, transform.position) < minDistancePLayer)
+                    {
+                        closestPlayer = p;
+                        minDistancePLayer = Vector3.Distance(p.transform.position, transform.position);
+                    }
+                }
+
+                foreach (GameObject p in towers)
+                {
+                    if (Vector3.Distance(p.transform.position, transform.position) < minDistanceTower)
+                    {
+                        closestTower = p;
+                        minDistanceTower = Vector3.Distance(p.transform.position, transform.position);
+                    }
+                }
+
+                if (currentTargetTower == null)
+                {
+                    if (Vector3.Distance(closestTower.transform.position, transform.position) < enemyStats.radiusAttack)
+                    {
+                        currentTargetTower = closestTower;
+                        return;
+                    }
+                }
+
+                navMeshAgent.SetDestination(closestPlayer.transform.position);
+
+                if (!isAttacking)
+                {
+                    if (Vector3.Distance(closestPlayer.transform.position, transform.position) < enemyStats.radiusAttack)
+                    {
+                        StartCoroutine(Attack(closestPlayer));
+                    }
                 }
             }
-
-            navMeshAgent.SetDestination(closestPlayer.transform.position);
-
-            if (!isAttacking)
-                if (Vector3.Distance(closestPlayer.transform.position, transform.position) < 1.5f)
+            else
+            {
+                navMeshAgent.SetDestination(currentTargetTower.transform.position);
+                if (!isAttacking)
                 {
-                    StartCoroutine(Attack(closestPlayer));
+                    if (Vector3.Distance(currentTargetTower.transform.position, transform.position) < enemyStats.radiusAttack)
+                    {
+                        StartCoroutine(Attack(currentTargetTower));
+                    }
                 }
+            }
         }
     }
 
     IEnumerator Attack(GameObject other)
     {
         isAttacking = true;
-        yield return new WaitForSeconds(attackSpeed);
-        if(Vector3.Distance(other.transform.position, transform.position) < 1.5f)
+        yield return new WaitForSeconds(enemyStats.attackSpeed / 60f);
+        if(Vector3.Distance(other.transform.position, transform.position) < enemyStats.radiusAttack)
         {
             if (other.GetComponent<PlayerController>())
             {
-                other.GetComponent<PlayerController>().AddLife(-dmg);
-                //run animation
+                other.GetComponent<PlayerController>().AddLife(-enemyStats.attack);
+            }
+
+            if (other.GetComponent<Tower>())
+            {
+                other.GetComponent<Tower>().AddLife(-enemyStats.attack);
             }
         }
+
+        if (other.tag == "Tower")
+            currentTargetTower = null;
+
         isAttacking = false;
     }
 
