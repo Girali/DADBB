@@ -5,7 +5,7 @@ using Photon.Pun;
 
 public class PlayerController : MonoBehaviour
 {
-
+    GizmoView gizmoView;
     bool canMove = true;
     float speed = 5f;
     float currentLookSensitivity = 2f;
@@ -127,6 +127,7 @@ public class PlayerController : MonoBehaviour
                 Cursor.lockState = CursorLockMode.Locked;
                 Cursor.visible = false;
                 gameObject.tag = "LocalPlayer";
+                gizmoView = GameObject.Find("PlayerTowerGizmo").GetComponent<GizmoView>();
             }
             else
             {
@@ -139,6 +140,16 @@ public class PlayerController : MonoBehaviour
     {
         if (pv.IsMine || offline)
         {
+            if(!pv.Owner.IsMasterClient)
+            {
+                RaycastHit hit;
+                if (Physics.Raycast(view.transform.position, view.transform.forward, out hit))
+                {
+                    Vector3Int v = new Vector3Int(Mathf.FloorToInt(hit.point.x), Mathf.FloorToInt(hit.point.y), Mathf.FloorToInt(hit.point.z));
+                    gizmoView.transform.position = v + new Vector3(0.5f,0, 0.5f);
+                }
+            }
+
             if (Input.GetKeyDown(KeyCode.O))
                 AddLife(10);
 

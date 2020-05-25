@@ -5,13 +5,12 @@ using UnityEngine;
 public class SubZeroBomb : Projectile
 {
     Projectile projectile;
-    // Start is called before the first frame update
+
     void Start()
     {
         projectile = gameObject.AddComponent<Projectile>();
     }
 
-    // Update is called once per frame
     void Update()
     {
         
