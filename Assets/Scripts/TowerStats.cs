@@ -7,6 +7,7 @@ public class TowerStats : ScriptableObject
 {
     public string towerName;
 
+    public string target = "Enemy";
     public int attack;
     public int health;
     public float attackSpeed;

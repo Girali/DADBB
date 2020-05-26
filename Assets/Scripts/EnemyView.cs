@@ -10,13 +10,13 @@ public class EnemyView : MonoBehaviour
 
     public void Init(int life)
     {
-        lifeBar.fillAmount = 1f;
+        lifeBar.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 110);
         lifeText.text = life.ToString();
     }
 
     public void UpdateLife(int life,int maxLife)
     {
-        lifeBar.fillAmount = Mathf.Lerp(0, 110, life / maxLife);
+        lifeBar.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Mathf.Lerp(0, 110, life / maxLife));
         lifeText.text = life.ToString();
     }
 }

@@ -12,14 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7560f6520e428234f95d98439a95cd3b, type: 3}
   m_Name: Attack
   m_EditorClassIdentifier: 
-  towerName: Healing
-  description: My first Tower
-  artwork: {fileID: 0}
-  manaCost: 3
-  attack: 150
-  health: 2000
+  towerName: Attack
+  target: Enemy
+  attack: 10
+  health: 100
   attackSpeed: 10
-  radiusProjectile: 1
-  radiusDamageProjectile: 1
-  projectile: {fileID: 2713166278678200680, guid: 99d06bdfe0eeb4341b2485dc46208937,
+  rotationSpeed: 2
+  bulletSpeed: 5
+  projectile: {fileID: 3595621798722449466, guid: f21eb3c48f5c83145972f33dbac939b4,
     type: 3}

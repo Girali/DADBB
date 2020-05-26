@@ -20,6 +20,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     Transform view = null;
     PlayerBuilderMotor playerBuilderMotor;
+    GameController gameController;
 
     void Mouvement(float x, float z)
     {
@@ -91,7 +92,7 @@ public class PlayerController : MonoBehaviour
         pv = GetComponent<PhotonView>();
         playerView = GetComponent<PlayerView>();
         playerBuilderMotor = GetComponent<PlayerBuilderMotor>();
-
+        gameController = FindObjectOfType<GameController>();
         if (offline)
         {
             Cursor.lockState = CursorLockMode.Locked;
@@ -177,20 +178,14 @@ public class PlayerController : MonoBehaviour
             else
             {
                 if (Input.GetKeyDown(KeyCode.Alpha1))
-                    Debug.Log("Use1");
+                    gameController.SpawnMinions();
                 if (Input.GetKeyDown(KeyCode.Alpha2))
-                    Debug.Log("Use2");
+                    gameController.SpawnElites();
                 if (Input.GetKeyDown(KeyCode.Alpha3))
-                    Debug.Log("Use3");
+                    gameController.SpawnBoss();
                 if (Input.GetKeyDown(KeyCode.Alpha4))
-                    Debug.Log("Use4");
+                    gameController.SpawnMeteors();
             }
-
-            if (Input.GetKeyDown(KeyCode.O))
-                AddLife(10);
-
-            if (Input.GetKeyDown(KeyCode.P))
-                AddLife(-10);
 
             CameraMouvement(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
         }

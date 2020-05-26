@@ -13,9 +13,7 @@ MonoBehaviour:
   m_Name: Minion
   m_EditorClassIdentifier: 
   enemyName: Minion
-  description: 
-  artwork: {fileID: 0}
   attack: 10
-  health: 100
+  health: 40
   attackSpeed: 60
   radiusAttack: 2

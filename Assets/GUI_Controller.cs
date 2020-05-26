@@ -18,11 +18,36 @@ public class GUI_Controller : MonoBehaviour
         }
     }
 
+    public void StartAbility1()
+    {
+
+    }
+
+    public void StartAbility2()
+    {
+
+    }
+
+    public void StartAbility3()
+    {
+
+    }
+
+    public void StartAbility4()
+    {
+
+    }
+
     private void Start()
     {
         if(Photon.Pun.PhotonNetwork.IsMasterClient)
         {
             lifeObject.SetActive(false);
+            //TODO YURI desactiver les ability du master
+        }
+        else
+        {
+            //TODO YURI desactiver les ability du player
         }
     }
 }

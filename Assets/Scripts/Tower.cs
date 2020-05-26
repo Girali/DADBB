@@ -38,43 +38,45 @@ public class Tower : MonoBehaviour
     {
         if (PhotonNetwork.IsMasterClient)
         {
-            float distanceToEnemy = 0;
-
-            GameObject nearestEnemy = null;
-            float singleStep = 1f * Time.deltaTime * towerStats.rotationSpeed;
-            GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
-
-            foreach (GameObject enemy in enemies)
+            if (headTransform == null)
             {
-                if (distanceToEnemy > Vector3.Distance(enemy.transform.position, headTransform.position) || distanceToEnemy == 0)
-                {
-                    RaycastHit hit;
-                    Ray ray = new Ray(headTransform.position, enemy.transform.position - headTransform.position);
-                    if (Physics.Raycast(ray, out hit, Mathf.Infinity, 1 << 8))
-                    {
-                        if (hit.transform == enemy.transform)
-                        {
-                            distanceToEnemy = Vector3.Distance(enemy.transform.position, headTransform.position);
-                            nearestEnemy = enemy;
-                            if (canShot == true)
-                            {
-                                Fire();
-                                StartCoroutine(ShotCoroutine());
-                            }
+                float distanceToEnemy = 0;
 
+                GameObject nearestEnemy = null;
+                float singleStep = 1f * Time.deltaTime * towerStats.rotationSpeed;
+                GameObject[] enemies = GameObject.FindGameObjectsWithTag(towerStats.target);
+
+                foreach (GameObject enemy in enemies)
+                {
+                    if (distanceToEnemy > Vector3.Distance(enemy.transform.position, headTransform.position) || distanceToEnemy == 0)
+                    {
+                        RaycastHit hit;
+                        Ray ray = new Ray(headTransform.position, enemy.transform.position - headTransform.position);
+                        if (Physics.Raycast(ray, out hit, Mathf.Infinity, 1 << 8))
+                        {
+                            if (hit.transform == enemy.transform)
+                            {
+                                distanceToEnemy = Vector3.Distance(enemy.transform.position, headTransform.position);
+                                nearestEnemy = enemy;
+                                if (canShot == true)
+                                {
+                                    Fire();
+                                    StartCoroutine(ShotCoroutine());
+                                }
+                            }
                         }
                     }
                 }
-            }
 
-            if (nearestEnemy != null)
-            {
-                Vector3 targetDirection = headTransform.position - nearestEnemy.transform.position;
-                Vector3 currentDirection = headTransform.forward;
+                if (nearestEnemy != null)
+                {
+                    Vector3 targetDirection = headTransform.position - nearestEnemy.transform.position;
+                    Vector3 currentDirection = headTransform.forward;
 
-                Vector3 newDirection = Vector3.RotateTowards(currentDirection, targetDirection, singleStep, 1.0f);
-                Debug.DrawRay(headTransform.position, nearestEnemy.transform.position - headTransform.position);
-                headTransform.rotation = Quaternion.LookRotation(newDirection);
+                    Vector3 newDirection = Vector3.RotateTowards(currentDirection, targetDirection, singleStep, 1.0f);
+                    Debug.DrawRay(headTransform.position, nearestEnemy.transform.position - headTransform.position);
+                    headTransform.rotation = Quaternion.LookRotation(newDirection);
+                }
             }
         }
     }
@@ -110,13 +112,13 @@ public class Tower : MonoBehaviour
 
     public void Init(int life)
     {
-        lifeBar.fillAmount = 1f;
+        lifeBar.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 110);
         lifeText.text = life.ToString();
     }
 
     public void UpdateLife(int life, int maxLife)
     {
-        lifeBar.fillAmount = Mathf.Lerp(0, 110, life / maxLife);
+        lifeBar.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Mathf.Lerp(0, 110, life / maxLife));
         lifeText.text = life.ToString();
     }
 

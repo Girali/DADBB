@@ -11,6 +11,12 @@ public class GameController : MonoBehaviour
     public Transform spawnPointPlayer;
     public Transform spawnPointMaster;
 
+    public Transform spawnMinion;
+    public Transform spawnElite;
+    public Transform spawnBoss;
+
+    public GameObject[] mobs;
+
     PhotonView pv;
 
     bool gameStarted = false;
@@ -34,7 +40,37 @@ public class GameController : MonoBehaviour
         if (PhotonNetwork.IsMasterClient)
             if (Input.GetKeyDown(KeyCode.Space) && !gameStarted)
                 StartGame();
+    }
 
+    public void SpawnMinions()
+    {
+        StartCoroutine(CRT_SpawnMobs(0, 5, spawnMinion.transform));
+        GUI_Controller.Instance.StartAbility1();
+    }
+
+    public void SpawnElites()
+    {
+        GUI_Controller.Instance.StartAbility2();
+        StartCoroutine(CRT_SpawnMobs(1, 2, spawnElite.transform));
+    }
+    public void SpawnBoss()
+    {
+        GUI_Controller.Instance.StartAbility3();
+        StartCoroutine(CRT_SpawnMobs(2, 1, spawnBoss.transform));
+    }
+    public void SpawnMeteors()
+    {
+        //TODO
+        GUI_Controller.Instance.StartAbility4();
+    }
+
+    IEnumerator CRT_SpawnMobs(int index, int count, Transform spawn)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            PhotonNetwork.Instantiate(mobs[index].name, spawn.position, spawn.rotation);
+            yield return new WaitForSeconds(1.5f);
+        }
     }
 
     private void StartGame()

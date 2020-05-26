@@ -8,6 +8,7 @@ TagManager:
   - Bonus
   - Malus
   - Enemy
+  - Tower
   layers:
   - Default
   - TransparentFX
