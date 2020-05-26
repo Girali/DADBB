@@ -62,6 +62,7 @@ public class PlayerController : MonoBehaviour
     [PunRPC]
     void RPC_Death()
     {
+        gameController.camera.SetActive(true);
         PhotonNetwork.RemoveRPCs(pv);
         PhotonNetwork.Destroy(pv);
     }
@@ -149,52 +150,58 @@ public class PlayerController : MonoBehaviour
     {
         if (pv.IsMine || offline)
         {
-            if(!pv.Owner.IsMasterClient)
+            if (gameController.gameStarted)
             {
-                RaycastHit hit;
-                if (Physics.Raycast(view.transform.position, view.transform.forward, out hit))
+                if (!pv.Owner.IsMasterClient)
                 {
-                    Vector3Int v = new Vector3Int(Mathf.FloorToInt(hit.point.x), 0, Mathf.FloorToInt(hit.point.z));
-                    if (hit.distance < 4f)
+                    RaycastHit hit;
+                    if (Physics.Raycast(view.transform.position, view.transform.forward, out hit))
                     {
-                        gizmoView.transform.position = v + new Vector3(0.5f, Mathf.FloorToInt(hit.point.y) + 0.25f, 0.5f);
-                        if(Physics.CheckBox(v + new Vector3(0.5f, Mathf.FloorToInt(hit.point.y) + 0.75f, 0.5f),new Vector3(0.5f,0.5f,0.5f)))
+                        Vector3Int v = new Vector3Int(Mathf.FloorToInt(hit.point.x), 0, Mathf.FloorToInt(hit.point.z));
+                        if (hit.distance < 4f)
                         {
-                            gizmoView.IsNotOk();
+                            gizmoView.transform.position = v + new Vector3(0.5f, Mathf.FloorToInt(hit.point.y) + 0.25f, 0.5f);
+                            if (Physics.CheckBox(v + new Vector3(0.5f, Mathf.FloorToInt(hit.point.y) + 0.75f, 0.5f), new Vector3(0.5f, 0.5f, 0.5f)))
+                            {
+                                gizmoView.IsNotOk();
+                            }
+                            else
+                            {
+                                gizmoView.IsOk();
+                                if (Input.GetKeyDown(KeyCode.Alpha1))
+                                    playerBuilderMotor.SpawnTowerAt(gizmoView.transform.position, 0);
+                                if (Input.GetKeyDown(KeyCode.Alpha2))
+                                    playerBuilderMotor.SpawnTowerAt(gizmoView.transform.position, 1);
+                                if (Input.GetKeyDown(KeyCode.Alpha3))
+                                    playerBuilderMotor.SpawnTowerAt(gizmoView.transform.position, 2);
+                                if (Input.GetKeyDown(KeyCode.Alpha4))
+                                    playerBuilderMotor.SpawnTowerAt(gizmoView.transform.position, 3);
+                            }
                         }
                         else
                         {
-                            gizmoView.IsOk();
-                            if (Input.GetKeyDown(KeyCode.Alpha1))
-                                playerBuilderMotor.SpawnTowerAt(gizmoView.transform.position, 0);
-                            if (Input.GetKeyDown(KeyCode.Alpha2))
-                                playerBuilderMotor.SpawnTowerAt(gizmoView.transform.position, 1);
-                            if (Input.GetKeyDown(KeyCode.Alpha3))
-                                playerBuilderMotor.SpawnTowerAt(gizmoView.transform.position, 2);
-                            if (Input.GetKeyDown(KeyCode.Alpha4))
-                                playerBuilderMotor.SpawnTowerAt(gizmoView.transform.position, 3);
+                            gizmoView.transform.position = Vector3.zero;
                         }
                     }
-                    else
-                    {
-                        gizmoView.transform.position = Vector3.zero;
-                    }
+                }
+                else
+                {
+                    if (Input.GetKeyDown(KeyCode.Alpha1))
+                        gameController.SpawnMinions();
+                    if (Input.GetKeyDown(KeyCode.Alpha2))
+                        gameController.SpawnElites();
+                    if (Input.GetKeyDown(KeyCode.Alpha3))
+                        gameController.SpawnBoss();
+                    if (Input.GetKeyDown(KeyCode.Alpha4))
+                        gameController.SpawnMeteors();
                 }
             }
-            else
-            {
-                if (Input.GetKeyDown(KeyCode.Alpha1))
-                    gameController.SpawnMinions();
-                if (Input.GetKeyDown(KeyCode.Alpha2))
-                    gameController.SpawnElites();
-                if (Input.GetKeyDown(KeyCode.Alpha3))
-                    gameController.SpawnBoss();
-                if (Input.GetKeyDown(KeyCode.Alpha4))
-                    gameController.SpawnMeteors();
-            }
-
             CameraMouvement(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
         }
+
+
+
+
     }
 
     private void FixedUpdate()

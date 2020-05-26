@@ -22,6 +22,9 @@ public class GUI_Controller : MonoBehaviour
     public GameObject Button_Barricade;
     public GameObject Button_Super_Tower;
 
+    public GameObject spaceToStart;
+    public Text endText;
+
     public static GUI_Controller Instance
     {
         get
@@ -30,6 +33,11 @@ public class GUI_Controller : MonoBehaviour
                 instance = FindObjectOfType<GUI_Controller>();
             return instance;
         }
+    }
+
+    public void StartedGame()
+    {
+        spaceToStart.SetActive(false);
     }
 
     public void StartAbility1()
@@ -59,29 +67,31 @@ public class GUI_Controller : MonoBehaviour
 
     public void StartPlayerAbility2()
     {
-        StartCoroutine(Activate(Button_Heal_Tower,20));
+        StartCoroutine(Activate(Button_Barricade, 30));
     }
 
     public void StartPlayerAbility3()
     {
-        StartCoroutine(Activate(Button_Barricade,30));
+        StartCoroutine(Activate(Button_Heal_Tower, 50));
     }
 
     public void StartPlayerAbility4()
     {
-        StartCoroutine(Activate(Button_Super_Tower,50));
+        StartCoroutine(Activate(Button_Super_Tower,60));
     }
-
 
     private void Start()
     {
         if(Photon.Pun.PhotonNetwork.IsMasterClient)
         {
             player.SetActive(false);
+            spaceToStart.SetActive(true);
         }
         else
         {
             master.SetActive(false);
+            spaceToStart.GetComponent<Text>().text = "Waiting for players";
+            spaceToStart.SetActive(true);
         }
     }
 

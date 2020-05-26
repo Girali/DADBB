@@ -5,7 +5,8 @@ using Photon.Pun;
 
 public class GameController : MonoBehaviour
 {
-
+    public GameObject camera;
+    public MeteorRain meteorRain;
     public GameObject playerPrefab;
 
     public Transform spawnPointPlayer;
@@ -24,26 +25,47 @@ public class GameController : MonoBehaviour
     float[] cdAbilitys = { 10, 20, 30, 50 };
     float[] nextTimeOk = { 0, 0, 0, 0 };
 
-    public void SpawnTowerAt(int i)
+    public void Interact(int i)
     {
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+
         if (Time.time > nextTimeOk[i])
         {
             switch (i)
             {
                 case 0:
-                    GUI_Controller.Instance.StartPlayerAbility1();
+                    StartCoroutine(CRT_SpawnMobs(0, 5 * players.Length, spawnMinion.transform));
+                    GUI_Controller.Instance.StartAbility1();
                     break;
 
                 case 1:
-                    GUI_Controller.Instance.StartPlayerAbility2();
+                    GUI_Controller.Instance.StartAbility2();
+                    StartCoroutine(CRT_SpawnMobs(1, 2 * players.Length, spawnElite.transform));
                     break;
 
                 case 2:
-                    GUI_Controller.Instance.StartPlayerAbility3();
+                    GUI_Controller.Instance.StartAbility3();
+                    StartCoroutine(CRT_SpawnMobs(2, 1 * players.Length, spawnBoss.transform));
                     break;
 
                 case 3:
-                    GUI_Controller.Instance.StartPlayerAbility4();
+                    GUI_Controller.Instance.StartAbility4();
+                    StartCoroutine(CRT_SpawnMobs(0, 5, spawnMinion.transform));
+                    StartCoroutine(CRT_SpawnMobs(1, 2, spawnElite.transform));
+                    StartCoroutine(CRT_SpawnMobs(2, 1, spawnBoss.transform));
+                    meteorRain.SpawnMeteorRain();
+                    GameObject[] towers = GameObject.FindGameObjectsWithTag("Tower");
+
+                    foreach (GameObject go in towers)
+                    {
+                        go.GetComponent<Tower>().AddLife(-40);
+                    }
+
+                    foreach (GameObject go in players)
+                    {
+                        if(!go.GetComponent<PhotonView>().Owner.IsMasterClient)
+                            go.GetComponent<PlayerController>().AddLife(-40);
+                    }
                     break;
 
                 default:
@@ -57,11 +79,6 @@ public class GameController : MonoBehaviour
     private void Awake()
     {
         pv = GetComponent<PhotonView>();
-        for (int i = 0; i < 4; i++)
-        {
-            nextTimeOk[i] = Time.time + cdAbilitys[i];
-        }
-
         if (PhotonNetwork.IsMasterClient)
         {
             PhotonNetwork.Instantiate(playerPrefab.name, spawnPointMaster.position, spawnPointMaster.rotation);
@@ -77,28 +94,26 @@ public class GameController : MonoBehaviour
         if (PhotonNetwork.IsMasterClient)
             if (Input.GetKeyDown(KeyCode.Space) && !gameStarted)
                 StartGame();
+
+        //GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
     }
 
     public void SpawnMinions()
     {
-        StartCoroutine(CRT_SpawnMobs(0, 5, spawnMinion.transform));
-        GUI_Controller.Instance.StartAbility1();
+        Interact(0);
     }
 
     public void SpawnElites()
     {
-        GUI_Controller.Instance.StartAbility2();
-        StartCoroutine(CRT_SpawnMobs(1, 2, spawnElite.transform));
+        Interact(1);
     }
     public void SpawnBoss()
     {
-        GUI_Controller.Instance.StartAbility3();
-        StartCoroutine(CRT_SpawnMobs(2, 1, spawnBoss.transform));
+        Interact(2);
     }
     public void SpawnMeteors()
     {
-        //TODO
-        GUI_Controller.Instance.StartAbility4();
+        Interact(3);
     }
 
     IEnumerator CRT_SpawnMobs(int index, int count, Transform spawn)
@@ -114,6 +129,10 @@ public class GameController : MonoBehaviour
     {
         PhotonNetwork.CurrentRoom.IsOpen = false;
         pv.RPC("RPC_StartGame", RpcTarget.All);
+        for (int i = 0; i < 4; i++)
+        {
+            nextTimeOk[i] = Time.time + cdAbilitys[i];
+        }
     }
     
     [PunRPC]
@@ -121,6 +140,16 @@ public class GameController : MonoBehaviour
     {
         gameStarted = true;
         GameObject.FindGameObjectWithTag("LocalPlayer").GetComponent<PlayerView>().StartGame();
+        GameObject.FindGameObjectWithTag("LocalPlayer").GetComponent<PlayerBuilderMotor>().StartGame();
+        GUI_Controller.Instance.StartPlayerAbility1();
+        GUI_Controller.Instance.StartPlayerAbility2();
+        GUI_Controller.Instance.StartPlayerAbility3();
+        GUI_Controller.Instance.StartPlayerAbility4();
+        GUI_Controller.Instance.StartAbility1();
+        GUI_Controller.Instance.StartAbility2();
+        GUI_Controller.Instance.StartAbility3();
+        GUI_Controller.Instance.StartAbility4();
+        GUI_Controller.Instance.StartedGame();
     }
 
 }

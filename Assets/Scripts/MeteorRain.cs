@@ -9,20 +9,15 @@ public class MeteorRain : MonoBehaviour
     public float spawnDistance = 10.0f;
     public float spawnHeight = 3f;
 
-    void SpawnMeteorRain()
+    public void SpawnMeteorRain()
     {
-        meteorRainSpawnPos = Camera.main.transform.position + Camera.main.transform.forward * spawnDistance;
-
-        meteorRainSpawnPos.y += spawnHeight;
-
-        if (Input.GetMouseButtonDown(0))
-        {
-            LaunchMeteorRain();
-        }
+        meteorRainSpawnPos = new Vector3(0,25,0);
+        meteorRainSpawnPos.y += spawnDistance;
+        LaunchMeteorRain();
     }
 
     void LaunchMeteorRain()
     {
-        Instantiate(meteorRain, meteorRainSpawnPos, Quaternion.identity);
+        Photon.Pun.PhotonNetwork.Instantiate(meteorRain.name, meteorRainSpawnPos, Quaternion.identity);
     }
 }

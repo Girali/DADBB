@@ -1,26 +1,42 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
 public class MeteorRainDestroy : MonoBehaviour
 {
     public float lifeTime = 10f;
+    PhotonView pv;
 
-    // Update is called once per frame
+    private void Awake()
+    {
+        pv = GetComponent<PhotonView>();
+    }
+
     void Update()
     {
-        if (lifeTime > 0)
+        if (PhotonNetwork.IsMasterClient)
         {
-            lifeTime -= Time.deltaTime;
-            if (lifeTime <= 0)
+            if (lifeTime > 0)
             {
-                DestroyMeteorRain();
-            } 
+                lifeTime -= Time.deltaTime;
+                if (lifeTime <= 0)
+                {
+                    Death();
+                }
+            }
         }
     }
 
-    void DestroyMeteorRain()
+    void Death()
     {
-        Destroy(this.gameObject);
+        pv.RPC("RPC_Death", pv.Owner);
+    }
+
+    [PunRPC]
+    void RPC_Death()
+    {
+        PhotonNetwork.RemoveRPCs(pv);
+        PhotonNetwork.Destroy(pv);
     }
 }

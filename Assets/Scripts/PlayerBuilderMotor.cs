@@ -8,12 +8,16 @@ public class PlayerBuilderMotor : MonoBehaviour
     PhotonView pv;
     public GameObject[] towers;
 
-    float[] cdAbilitys = { 10, 30, 40, 60 };
+    float[] cdAbilitys = { 10, 30, 50, 60 };
     float[] nextTimeOk = { 0, 0, 0, 0 };
 
     private void Awake()
     {
         pv = GetComponent<PhotonView>();
+    }
+
+    public void StartGame()
+    {
         for (int i = 0; i < 4; i++)
         {
             nextTimeOk[i] = Time.time + cdAbilitys[i];

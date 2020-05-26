@@ -7,9 +7,9 @@ using Photon.Pun;
 public class PlayerView : MonoBehaviour
 {
     public Text diagLife;
-    public MeshRenderer meshRenderer;
     public bool offline = false;
     PhotonView pv;
+    public GameObject renderObject;
 
     private void Awake()
     {
@@ -22,11 +22,13 @@ public class PlayerView : MonoBehaviour
         {
             if (pv.IsMine)
             {
+                Destroy(renderObject);
                 Destroy(diagLife.transform.parent.gameObject);
             }
 
             if (pv.Owner.IsMasterClient)
             {
+                Destroy(renderObject);
                 Destroy(diagLife.transform.parent.gameObject);
             }
         }
