@@ -69,7 +69,7 @@ public class GameController : MonoBehaviour
         for (int i = 0; i < count; i++)
         {
             PhotonNetwork.Instantiate(mobs[index].name, spawn.position, spawn.rotation);
-            yield return new WaitForSeconds(1.5f);
+            yield return new WaitForSeconds(2f);
         }
     }
 

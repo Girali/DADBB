@@ -16,7 +16,7 @@ public class EnemyView : MonoBehaviour
 
     public void UpdateLife(int life,int maxLife)
     {
-        lifeBar.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Mathf.Lerp(0, 110, life / maxLife));
+        lifeBar.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Mathf.Lerp(0, 110, life / (float)maxLife));
         lifeText.text = life.ToString();
     }
 }

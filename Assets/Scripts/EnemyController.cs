@@ -62,7 +62,7 @@ public class EnemyController : MonoBehaviour
                     }
                 }
 
-                if (currentTargetTower == null)
+                if (currentTargetTower == null && closestTower != null)
                 {
                     if (Vector3.Distance(closestTower.transform.position, transform.position) < enemyStats.radiusAttack)
                     {
@@ -146,8 +146,13 @@ public class EnemyController : MonoBehaviour
 
     void Death()
     {
+        pv.RPC("RPC_Death", pv.Owner);
+    }
+
+    [PunRPC]
+    void RPC_Death()
+    {
         PhotonNetwork.RemoveRPCs(pv);
         PhotonNetwork.Destroy(pv);
     }
-
 }

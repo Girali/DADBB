@@ -56,6 +56,12 @@ public class PlayerController : MonoBehaviour
 
     void Death()
     {
+        pv.RPC("RPC_Death", pv.Owner);
+    }
+
+    [PunRPC]
+    void RPC_Death()
+    {
         PhotonNetwork.RemoveRPCs(pv);
         PhotonNetwork.Destroy(pv);
     }

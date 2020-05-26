@@ -14,8 +14,6 @@ public class Tower : MonoBehaviour
 
     private int currentLife;
     private int maxLife;
-    private GameObject projectile;
-
 
     public Transform headTransform;
     public Transform barel;
@@ -38,12 +36,11 @@ public class Tower : MonoBehaviour
     {
         if (PhotonNetwork.IsMasterClient)
         {
-            if (headTransform == null)
+            if (headTransform != null)
             {
                 float distanceToEnemy = 0;
 
                 GameObject nearestEnemy = null;
-                float singleStep = 1f * Time.deltaTime * towerStats.rotationSpeed;
                 GameObject[] enemies = GameObject.FindGameObjectsWithTag(towerStats.target);
 
                 foreach (GameObject enemy in enemies)
@@ -52,7 +49,7 @@ public class Tower : MonoBehaviour
                     {
                         RaycastHit hit;
                         Ray ray = new Ray(headTransform.position, enemy.transform.position - headTransform.position);
-                        if (Physics.Raycast(ray, out hit, Mathf.Infinity, 1 << 8))
+                        if (Physics.Raycast(ray, out hit, Mathf.Infinity))
                         {
                             if (hit.transform == enemy.transform)
                             {
@@ -70,12 +67,12 @@ public class Tower : MonoBehaviour
 
                 if (nearestEnemy != null)
                 {
-                    Vector3 targetDirection = headTransform.position - nearestEnemy.transform.position;
-                    Vector3 currentDirection = headTransform.forward;
-
-                    Vector3 newDirection = Vector3.RotateTowards(currentDirection, targetDirection, singleStep, 1.0f);
-                    Debug.DrawRay(headTransform.position, nearestEnemy.transform.position - headTransform.position);
-                    headTransform.rotation = Quaternion.LookRotation(newDirection);
+                    Quaternion rot = Quaternion.LookRotation(nearestEnemy.transform.position - headTransform.position, Vector3.up);
+                    headTransform.rotation = Quaternion.Lerp(headTransform.rotation, rot, 0.5f);
+                }
+                else
+                {
+                    headTransform.rotation = Quaternion.Lerp(headTransform.rotation, Quaternion.identity, 0.5f);
                 }
             }
         }
@@ -118,11 +115,17 @@ public class Tower : MonoBehaviour
 
     public void UpdateLife(int life, int maxLife)
     {
-        lifeBar.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Mathf.Lerp(0, 110, life / maxLife));
+        lifeBar.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Mathf.Lerp(0, 110, life / (float)maxLife));
         lifeText.text = life.ToString();
     }
 
     void Death()
+    {
+        pv.RPC("RPC_Death",pv.Owner);
+    }
+
+    [PunRPC]
+    void RPC_Death()
     {
         PhotonNetwork.RemoveRPCs(pv);
         PhotonNetwork.Destroy(pv);
@@ -136,7 +139,7 @@ public class Tower : MonoBehaviour
 
     void Fire()
     {
-        GameObject p = Instantiate(projectile, barel.position, barel.rotation);
+        GameObject p = PhotonNetwork.Instantiate(towerStats.projectile.name, barel.position, barel.rotation);
         p.GetComponent<Projectile>().Init(towerStats.bulletSpeed, towerStats.attack);
         canShot = false;
     }
