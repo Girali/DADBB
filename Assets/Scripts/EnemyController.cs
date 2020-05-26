@@ -99,22 +99,29 @@ public class EnemyController : MonoBehaviour
     {
         isAttacking = true;
         yield return new WaitForSeconds(enemyStats.attackSpeed / 60f);
-        if(Vector3.Distance(other.transform.position, transform.position) < enemyStats.radiusAttack)
+        if (other != null)
         {
-            if (other.GetComponent<PlayerController>())
+            if (Vector3.Distance(other.transform.position, transform.position) < enemyStats.radiusAttack)
             {
-                other.GetComponent<PlayerController>().AddLife(-enemyStats.attack);
+                if (other.GetComponent<PlayerController>())
+                {
+                    other.GetComponent<PlayerController>().AddLife(-enemyStats.attack);
+                }
+
+                if (other.GetComponent<Tower>())
+                {
+                    other.GetComponent<Tower>().AddLife(-enemyStats.attack);
+                }
             }
 
-            if (other.GetComponent<Tower>())
-            {
-                other.GetComponent<Tower>().AddLife(-enemyStats.attack);
-            }
+            if (other.tag == "Tower")
+                currentTargetTower = null;
+
         }
-
-        if (other.tag == "Tower")
+        else
+        {
             currentTargetTower = null;
-
+        }
         isAttacking = false;
     }
 

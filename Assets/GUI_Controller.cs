@@ -43,11 +43,11 @@ public class GUI_Controller : MonoBehaviour
         if(Photon.Pun.PhotonNetwork.IsMasterClient)
         {
             lifeObject.SetActive(false);
-            //TODO YURI desactiver les ability du master
+            //TODO YURI desactiver les ability du player
         }
         else
         {
-            //TODO YURI desactiver les ability du player
+            //TODO YURI desactiver les ability du master
         }
     }
 }

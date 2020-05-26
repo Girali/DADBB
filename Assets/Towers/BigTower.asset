@@ -16,7 +16,7 @@ MonoBehaviour:
   target: Enemy
   attack: 20
   health: 200
-  attackSpeed: 120
+  attackSpeed: 500
   rotationSpeed: 4
   bulletSpeed: 10
   projectile: {fileID: 3595621798722449466, guid: f21eb3c48f5c83145972f33dbac939b4,

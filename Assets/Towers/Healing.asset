@@ -16,7 +16,7 @@ MonoBehaviour:
   target: Player
   attack: -10
   health: 30
-  attackSpeed: 5
+  attackSpeed: 60
   rotationSpeed: 2
   bulletSpeed: 5
   projectile: {fileID: 3595621798722449466, guid: f21eb3c48f5c83145972f33dbac939b4,

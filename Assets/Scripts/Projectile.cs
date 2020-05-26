@@ -6,18 +6,36 @@ public class Projectile : MonoBehaviour
 {
     public float speed;
     public int damage;
+    public Transform target;
+    bool inited = false;
+    PhotonView pv;
 
-    public void Init(float pSpeed, int pDamage)
+
+    public void Init(float pSpeed, int pDamage, Transform pTarget)
     {
+        pv = GetComponent<PhotonView>();
         speed = pSpeed;
         damage = pDamage;
+        inited = true;
+        target = pTarget;
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
-        if (PhotonNetwork.IsMasterClient)
+        if (inited)
         {
-            transform.position += transform.forward * Time.deltaTime * speed;
+            if (PhotonNetwork.IsMasterClient)
+            {
+                if (target != null)
+                {
+                    transform.position += transform.forward * Time.deltaTime * speed;
+                    transform.LookAt(target);
+                }
+                else
+                {
+                    Explode();
+                }
+            }
         }
     }
 
@@ -25,16 +43,33 @@ public class Projectile : MonoBehaviour
     {
         if (PhotonNetwork.IsMasterClient)
         {
-            if (other.tag == "Enemy")
+            if (other.tag == target.tag)
             {
-                other.GetComponent<EnemyController>().AddLife(-damage);
+                if(other.GetComponent<EnemyController>())
+                    other.GetComponent<EnemyController>().AddLife(-damage);
+
+                if (other.GetComponent<PlayerController>())
+                    other.GetComponent<PlayerController>().AddLife(-damage);
                 Explode();
             }
         }
     }
 
+    void Death()
+    {
+        pv.RPC("RPC_Death", pv.Owner);
+    }
+
+    [PunRPC]
+    void RPC_Death()
+    {
+        PhotonNetwork.RemoveRPCs(pv);
+        PhotonNetwork.Destroy(pv);
+    }
+
+
     public virtual void Explode()
     {
-        Destroy(gameObject);
+        Death();
     }
 }

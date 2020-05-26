@@ -57,7 +57,7 @@ public class Tower : MonoBehaviour
                                 nearestEnemy = enemy;
                                 if (canShot == true)
                                 {
-                                    Fire();
+                                    Fire(nearestEnemy.transform);
                                     StartCoroutine(ShotCoroutine());
                                 }
                             }
@@ -137,10 +137,10 @@ public class Tower : MonoBehaviour
         canShot = true;
     }
 
-    void Fire()
+    void Fire(Transform target)
     {
         GameObject p = PhotonNetwork.Instantiate(towerStats.projectile.name, barel.position, barel.rotation);
-        p.GetComponent<Projectile>().Init(towerStats.bulletSpeed, towerStats.attack);
+        p.GetComponent<Projectile>().Init(towerStats.bulletSpeed, towerStats.attack, target);
         canShot = false;
     }
 }
