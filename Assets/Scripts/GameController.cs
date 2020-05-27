@@ -153,7 +153,7 @@ public class GameController : MonoBehaviour
     private void StartGame()
     {
         PhotonNetwork.CurrentRoom.IsOpen = false;
-        endGameTimer = Time.time + (6 * 10);
+        endGameTimer = Time.time + (60 * 10);
         pv.RPC("RPC_StartGame", RpcTarget.All);
         for (int i = 0; i < 4; i++)
         {
