@@ -19,5 +19,5 @@ MonoBehaviour:
   attackSpeed: 60
   rotationSpeed: 2
   bulletSpeed: 5
-  projectile: {fileID: 3595621798722449466, guid: f21eb3c48f5c83145972f33dbac939b4,
+  projectile: {fileID: 3595621798722449466, guid: 8958f83025b4bcc4f9e3fbd931263cd1,
     type: 3}

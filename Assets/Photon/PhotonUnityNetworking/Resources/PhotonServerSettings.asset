@@ -34,5 +34,7 @@ MonoBehaviour:
   - RPC_Death
   - RPC_setLife
   - RPC_StartGame
+  - RPC_WinMaster
+  - RPC_WinPlayer
   DisableAutoOpenWizard: 1
   ShowSettings: 0

@@ -21,6 +21,7 @@ public class GameController : MonoBehaviour
     PhotonView pv;
 
     public bool gameStarted = false;
+    public float endGameTimer = 0f;
 
     float[] cdAbilitys = { 10, 20, 30, 50 };
     float[] nextTimeOk = { 0, 0, 0, 0 };
@@ -95,7 +96,31 @@ public class GameController : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Space) && !gameStarted)
                 StartGame();
 
-        //GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        if (Input.GetKeyDown(KeyCode.Escape))
+            Application.Quit();
+
+        if (PhotonNetwork.IsMasterClient && gameStarted)
+        {
+            GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+
+            if(players.Length == 0)
+                pv.RPC("RPC_WinMaster", RpcTarget.All);
+
+            if(Time.time > endGameTimer)
+                pv.RPC("RPC_WinPlayer", RpcTarget.All);
+        }
+    }
+
+    [PunRPC]
+    void RPC_WinPlayer()
+    {
+        GUI_Controller.Instance.TimerWin();
+    }
+
+    [PunRPC]
+    void RPC_WinMaster()
+    {
+        GUI_Controller.Instance.PlayerDeathWin();
     }
 
     public void SpawnMinions()
@@ -128,6 +153,7 @@ public class GameController : MonoBehaviour
     private void StartGame()
     {
         PhotonNetwork.CurrentRoom.IsOpen = false;
+        endGameTimer = Time.time + (6 * 10);
         pv.RPC("RPC_StartGame", RpcTarget.All);
         for (int i = 0; i < 4; i++)
         {

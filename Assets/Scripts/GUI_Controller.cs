@@ -104,4 +104,24 @@ public class GUI_Controller : MonoBehaviour
         Button.GetComponent<Button>().interactable = true;
     }
 
+
+    public void TimerWin()
+    {
+        timer.StopTimer();
+        endText.gameObject.SetActive(true);
+        if (Photon.Pun.PhotonNetwork.IsMasterClient)
+            endText.text = "Deafeat";
+        else
+            endText.text = "Win";
+    }
+
+    public void PlayerDeathWin()
+    {
+        timer.StopTimer();
+        endText.gameObject.SetActive(true);
+        if (!Photon.Pun.PhotonNetwork.IsMasterClient)
+            endText.text = "Deafeat";
+        else
+            endText.text = "Win";
+    }
 }

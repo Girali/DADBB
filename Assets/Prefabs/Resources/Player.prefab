@@ -437,6 +437,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   offline: 0
   view: {fileID: 8524664418102902396}
+  capsuleCollider: {fileID: 5788624732690412307}
 --- !u!114 &6794129492461383739
 MonoBehaviour:
   m_ObjectHideFlags: 0

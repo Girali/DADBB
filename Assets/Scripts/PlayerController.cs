@@ -21,11 +21,18 @@ public class PlayerController : MonoBehaviour
     Transform view = null;
     PlayerBuilderMotor playerBuilderMotor;
     GameController gameController;
+    bool grounded = false;
+    public CapsuleCollider capsuleCollider;
 
-    void Mouvement(float x, float z)
+    void Mouvement(float x, float z, bool j)
     {
         if (canMove)
         {
+            if (j && grounded)
+            {
+                rb.velocity += Vector3.up * 4f;
+            }
+
             Vector3 horizontalMove = Vector3.right * x;
             Vector3 verticalMove = Vector3.forward * z;
 
@@ -150,6 +157,17 @@ public class PlayerController : MonoBehaviour
     {
         if (pv.IsMine || offline)
         {
+            Collider[] colliders = Physics.OverlapSphere(transform.position - new Vector3(0, (capsuleCollider.bounds.size.y / 2f), 0), 0.1f, 15);
+            grounded = false;
+            foreach (Collider collider in colliders)
+            {
+                if (collider.GetHashCode() != capsuleCollider.GetHashCode())
+                {
+                    grounded = true;
+                }
+            }
+            
+
             if (gameController.gameStarted)
             {
                 if (!pv.Owner.IsMasterClient)
@@ -198,17 +216,13 @@ public class PlayerController : MonoBehaviour
             }
             CameraMouvement(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
         }
-
-
-
-
     }
 
     private void FixedUpdate()
     {
         if (pv.IsMine|| offline)
         {
-            Mouvement(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+            Mouvement(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"),Input.GetKeyDown(KeyCode.Space));
         }
     }
 }
