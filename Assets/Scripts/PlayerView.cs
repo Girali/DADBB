@@ -36,7 +36,8 @@ public class PlayerView : MonoBehaviour
 
     public void UpdateLife(int life)
     {
-        GUI_Controller.Instance.life.text = life.ToString();
+        if(pv.IsMine)
+            GUI_Controller.Instance.life.text = life.ToString();
 
         if (diagLife)
             diagLife.text = life.ToString();
